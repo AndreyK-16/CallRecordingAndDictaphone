@@ -39,6 +39,9 @@ class DictaphoneViewController: UIViewController, AVAudioRecorderDelegate, AVAud
         playBtn.addTarget(self, action: #selector(playBtnClicked(_: )), for: .touchUpInside)
         recordBtn.addTarget(self, action: #selector(recordBtnClicked(_: )), for: .touchUpInside)
         saveBtn.addTarget(self, action: #selector(saveBtnClicked(_: )), for: .touchUpInside)
+        
+        setupRecorder()
+        setupPlayer()
     }
     
     func getDocumentDirector() -> URL {
@@ -80,7 +83,7 @@ class DictaphoneViewController: UIViewController, AVAudioRecorderDelegate, AVAud
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         recordBtn.isEnabled = true
-//        playBtn.setTitle(UIImage(named: "play"), for: .normal)
+        playBtn.setImage(#imageLiteral(resourceName: "play"), for: .normal)
     }
     
     private func setupNavigationBar() {
@@ -120,46 +123,50 @@ class DictaphoneViewController: UIViewController, AVAudioRecorderDelegate, AVAud
         saveBtn.translatesAutoresizingMaskIntoConstraints = false
         saveBtn.leadingAnchor.constraint(equalTo: playBtn.trailingAnchor, constant: 40).isActive = true
         saveBtn.centerYAnchor.constraint(equalTo: playBtn.centerYAnchor).isActive = true
-        saveBtn.widthAnchor.constraint(equalToConstant: 80).isActive = true
-        saveBtn.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        saveBtn.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        saveBtn.heightAnchor.constraint(equalToConstant: 60).isActive = true
     }
     
 //    MARK: - action button
     
     @objc func playBtnClicked(_: UIButton) {
         print("test - play button clicked")
-        if recordBtn.isEnabled == true {
+        
+        if playBtn.currentImage == UIImage(named: "play") {
+            setupPlayer()
+            audioPlayer.play()
+            playBtn.setImage(#imageLiteral(resourceName: "stop"), for: .normal)
             recordBtn.isEnabled = false
-            recordBtn.alpha = 0.3
         } else {
-            recordBtn.isEnabled = true
+            audioPlayer.pause()
+            playBtn.setImage(#imageLiteral(resourceName: "play"), for: .normal)
+            recordBtn.isEnabled = false
             recordBtn.alpha = 1
         }
-        
     }
     
     @objc func recordBtnClicked(_: UIButton) {
         print("test - record button clicked")
-        if playBtn.isEnabled == true {
+        
+        if recordBtn.currentImage == UIImage(named: "record-red") {
+            audioRecorder.record()
+            recordBtn.setImage(#imageLiteral(resourceName: "stop-red"), for: .normal)
             playBtn.isEnabled = false
             playBtn.alpha = 0.3
-        } else {
-            playBtn.isEnabled = true
-            playBtn.alpha = 1
-        }
-        if saveBtn.isEnabled == true {
             saveBtn.isEnabled = false
             saveBtn.alpha = 0.3
         } else {
+            audioRecorder.stop()
+            recordBtn.setImage(#imageLiteral(resourceName: "record-red"), for: .normal)
+            playBtn.isEnabled = false
+            playBtn.alpha = 1
             saveBtn.isEnabled = true
             saveBtn.alpha = 1
         }
-
     }
     
     @objc func saveBtnClicked(_: UIButton) {
         print("test - save button clicked")
 
     }
-    
 }
